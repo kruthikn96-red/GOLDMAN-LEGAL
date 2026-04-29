@@ -1,0 +1,17 @@
+SECTION 7.3 PORTFOLIO CONCENTRATION LIMITS:
+
+The following limits shall apply to the overall portfolio:
+
+(i)   No more than 25% of the total portfolio value shall consist
+      of policies originating from any single state.
+
+(ii)  No more than 10% of the total portfolio value shall consist
+      of policies with a coverage amount exceeding $1,500,000.
+
+(iii) The weighted average credit score across all policies in the
+      portfolio shall not be less than 720.
+
+(iv)  No more than 5% of the total portfolio value shall consist
+      of policies where the primary applicant is under 25 years of age.
+
+(v)   The weighted average debt-to-income ratio shall not exceed 35%.

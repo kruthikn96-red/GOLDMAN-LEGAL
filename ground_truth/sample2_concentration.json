@@ -1,0 +1,89 @@
+{
+  "document_id": "sample2_concentration",
+  "section": "7.3",
+  "section_title": "PORTFOLIO CONCENTRATION LIMITS",
+  "rules": [
+    {
+      "rule_id": "7.3.i",
+      "section": "7.3",
+      "subsection": "i",
+      "source_text": "No more than 25% of the total portfolio value shall consist of policies originating from any single state.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "portfolio_subset_share",
+        "subset_groupby": "policy.origin_state",
+        "share_of": "total_portfolio_value_usd",
+        "share_constraint": {"op": "lte", "value": 25, "unit": "percent"}
+      }
+    },
+    {
+      "rule_id": "7.3.ii",
+      "section": "7.3",
+      "subsection": "ii",
+      "source_text": "No more than 10% of the total portfolio value shall consist of policies with a coverage amount exceeding $1,500,000.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "portfolio_subset_share",
+        "subset": {"op": "gt", "attr": "policy.coverage_amount_usd", "value": 1500000},
+        "share_of": "total_portfolio_value_usd",
+        "share_constraint": {"op": "lte", "value": 10, "unit": "percent"}
+      }
+    },
+    {
+      "rule_id": "7.3.iii",
+      "section": "7.3",
+      "subsection": "iii",
+      "source_text": "The weighted average credit score across all policies in the portfolio shall not be less than 720.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "portfolio_aggregate",
+        "aggregate": {
+          "function": "weighted_avg",
+          "attr": "applicant.credit_score",
+          "weight_attr": "policy.coverage_amount_usd"
+        },
+        "must_satisfy": {"op": "gte", "value": 720}
+      }
+    },
+    {
+      "rule_id": "7.3.iv",
+      "section": "7.3",
+      "subsection": "iv",
+      "source_text": "No more than 5% of the total portfolio value shall consist of policies where the primary applicant is under 25 years of age.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "portfolio_subset_share",
+        "subset": {
+          "op": "and",
+          "args": [
+            {"op": "eq", "attr": "policy.applicant.is_primary", "value": true},
+            {"op": "lt", "attr": "applicant.age_years", "value": 25}
+          ]
+        },
+        "share_of": "total_portfolio_value_usd",
+        "share_constraint": {"op": "lte", "value": 5, "unit": "percent"}
+      }
+    },
+    {
+      "rule_id": "7.3.v",
+      "section": "7.3",
+      "subsection": "v",
+      "source_text": "The weighted average debt-to-income ratio shall not exceed 35%.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "portfolio_aggregate",
+        "aggregate": {
+          "function": "weighted_avg",
+          "attr": "applicant.debt_to_income_ratio_pct",
+          "weight_attr": "policy.coverage_amount_usd"
+        },
+        "must_satisfy": {"op": "lte", "value": 35}
+      }
+    }
+  ]
+}

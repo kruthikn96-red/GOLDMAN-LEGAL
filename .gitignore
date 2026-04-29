@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+.DS_Store
+
+# Tool / IDE configs not meant for the take-home repo
+.claude/
+.codex
+.idea/
+.vscode/

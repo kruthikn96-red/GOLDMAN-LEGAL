@@ -1,0 +1,25 @@
+# Applicant attributes
+applicant.credit_score: {type: integer, range: [300, 850]}
+applicant.annual_income_usd: {type: number, unit: USD}
+applicant.debt_to_income_ratio_pct: {type: number, unit: percent}
+applicant.age_years: {type: integer, unit: years}
+applicant.country_of_residence: {type: enum, values: [US, US_TERRITORY, OTHER]}
+applicant.payment_overdue_days_max: {type: integer, unit: days}
+applicant.enrolled_in_approved_assistance_program: {type: boolean}
+applicant.cosigner.credit_score: {type: integer, range: [300, 850], nullable: true}
+
+# Policy attributes
+policy.coverage_amount_usd: {type: number, unit: USD}
+policy.outstanding_coverage_amount_usd: {type: number, unit: USD}
+policy.origin_state: {type: enum, values_source: us_states_iso}
+policy.applicant.is_primary: {type: boolean}
+policy.in_force_months: {type: integer, unit: months}
+policy.cancellation_within_months: {type: integer, unit: months, nullable: true}
+policy.lapse_days: {type: integer, unit: days}
+
+# Payment / event attributes
+payment.overdue_amount_usd: {type: number, unit: USD}
+payment.overdue_days: {type: integer, unit: days}
+
+# Aggregate bases
+total_portfolio_value_usd: {type: number, unit: USD, kind: aggregate_basis}

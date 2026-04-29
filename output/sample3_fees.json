@@ -1,0 +1,176 @@
+{
+  "document_id": "sample3_fees",
+  "section": "12.2",
+  "section_title": "FEES AND CHARGES",
+  "rules": [
+    {
+      "rule_id": "12.2.a",
+      "section": "12.2",
+      "subsection": "a",
+      "source_text": "Processing Fee: A one-time fee of $500 per application, due upon submission.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "fee",
+        "name": "Processing Fee",
+        "trigger": {
+          "event": "application_submission",
+          "when": null
+        },
+        "amount": {
+          "method": "fixed",
+          "value_usd": 500.0,
+          "rate": null,
+          "unit": null,
+          "of_attr": null,
+          "min_usd": null,
+          "max_usd": null,
+          "formula": null
+        },
+        "frequency": null,
+        "payment_terms": null
+      }
+    },
+    {
+      "rule_id": "12.2.b",
+      "section": "12.2",
+      "subsection": "b",
+      "source_text": "Annual Service Fee: 0.35% per annum of the outstanding coverage amount, payable monthly.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "fee",
+        "name": "Annual Service Fee",
+        "trigger": {
+          "event": "ongoing",
+          "when": null
+        },
+        "amount": {
+          "method": "percentage",
+          "value_usd": null,
+          "rate": 0.35,
+          "unit": "percent_per_annum",
+          "of_attr": "policy.outstanding_coverage_amount_usd",
+          "min_usd": null,
+          "max_usd": null,
+          "formula": null
+        },
+        "frequency": "monthly",
+        "payment_terms": null
+      }
+    },
+    {
+      "rule_id": "12.2.c",
+      "section": "12.2",
+      "subsection": "c",
+      "source_text": "Late Payment Fee: If any scheduled payment is more than 15 days overdue, a fee of 2% of the overdue amount shall apply, subject to a minimum of $25 and a maximum of $500.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "fee",
+        "name": "Late Payment Fee",
+        "trigger": {
+          "event": "payment_overdue",
+          "when": {
+            "op": "gt",
+            "attr": "payment.overdue_days",
+            "value": 15,
+            "unmapped": false,
+            "original_phrase": null
+          }
+        },
+        "amount": {
+          "method": "percentage",
+          "value_usd": null,
+          "rate": 2.0,
+          "unit": "percent",
+          "of_attr": "payment.overdue_amount_usd",
+          "min_usd": 25.0,
+          "max_usd": 500.0,
+          "formula": null
+        },
+        "frequency": null,
+        "payment_terms": null
+      }
+    },
+    {
+      "rule_id": "12.2.d",
+      "section": "12.2",
+      "subsection": "d",
+      "source_text": "Early Termination Fee: If the policy is cancelled within the first 24 months, the applicant shall pay a fee equal to 3 months of the annual service fee.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "fee",
+        "name": "Early Termination Fee",
+        "trigger": {
+          "event": "policy_cancellation",
+          "when": {
+            "op": "lte",
+            "attr": "policy.cancellation_within_months",
+            "value": 24,
+            "unmapped": false,
+            "original_phrase": null
+          }
+        },
+        "amount": {
+          "method": "derived",
+          "value_usd": null,
+          "rate": null,
+          "unit": null,
+          "of_attr": null,
+          "min_usd": null,
+          "max_usd": null,
+          "formula": {
+            "op": "multiply",
+            "args": [
+              {
+                "rule_ref": "3.1.b",
+                "field": "annual_amount"
+              },
+              {
+                "value": 3.0
+              }
+            ]
+          }
+        },
+        "frequency": null,
+        "payment_terms": null
+      }
+    },
+    {
+      "rule_id": "12.2.e",
+      "section": "12.2",
+      "subsection": "e",
+      "source_text": "Reinstatement Fee: $250 if the policy is reinstated after a lapse of more than 60 days.",
+      "confidence": "high",
+      "unmapped_attributes": [],
+      "body": {
+        "scope": "fee",
+        "name": "Reinstatement Fee",
+        "trigger": {
+          "event": "policy_reinstatement",
+          "when": {
+            "op": "gt",
+            "attr": "policy.lapse_days",
+            "value": 60,
+            "unmapped": false,
+            "original_phrase": null
+          }
+        },
+        "amount": {
+          "method": "fixed",
+          "value_usd": 250.0,
+          "rate": null,
+          "unit": null,
+          "of_attr": null,
+          "min_usd": null,
+          "max_usd": null,
+          "formula": null
+        },
+        "frequency": null,
+        "payment_terms": null
+      }
+    }
+  ]
+}

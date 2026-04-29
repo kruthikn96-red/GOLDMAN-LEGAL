@@ -1,0 +1,205 @@
+{
+  "summary": {
+    "rule_level": {
+      "gold": 18,
+      "pred": 18,
+      "matched": 18,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "critical_field_accuracy_avg": 0.9333333333333332
+  },
+  "documents": [
+    {
+      "document_id": "sample1_eligibility",
+      "rule_level": {
+        "gold": 8,
+        "pred": 8,
+        "matched": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing": [],
+        "extra": []
+      },
+      "field_accuracy": {
+        "scope": 1.0,
+        "body": 1.0,
+        "unmapped_attributes": 1.0
+      },
+      "critical_field_accuracy": 1.0,
+      "by_scope": {
+        "per_entity": {
+          "gold": 7,
+          "pred": 7,
+          "matched": 7,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "portfolio_subset_share": {
+          "gold": 1,
+          "pred": 1,
+          "matched": 1,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      },
+      "mismatches": []
+    },
+    {
+      "document_id": "sample2_concentration",
+      "rule_level": {
+        "gold": 5,
+        "pred": 5,
+        "matched": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing": [],
+        "extra": []
+      },
+      "field_accuracy": {
+        "scope": 1.0,
+        "body": 1.0,
+        "unmapped_attributes": 1.0
+      },
+      "critical_field_accuracy": 1.0,
+      "by_scope": {
+        "portfolio_subset_share": {
+          "gold": 3,
+          "pred": 3,
+          "matched": 3,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "portfolio_aggregate": {
+          "gold": 2,
+          "pred": 2,
+          "matched": 2,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      },
+      "mismatches": []
+    },
+    {
+      "document_id": "sample3_fees",
+      "rule_level": {
+        "gold": 5,
+        "pred": 5,
+        "matched": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing": [],
+        "extra": []
+      },
+      "field_accuracy": {
+        "scope": 1.0,
+        "body": 0.6,
+        "unmapped_attributes": 1.0
+      },
+      "critical_field_accuracy": 0.8,
+      "by_scope": {
+        "fee": {
+          "gold": 5,
+          "pred": 5,
+          "matched": 5,
+          "precision": 1.0,
+          "recall": 1.0
+        }
+      },
+      "mismatches": [
+        {
+          "rule_id": "12.2.a",
+          "field": "body",
+          "gold": {
+            "scope": "fee",
+            "name": "Processing Fee",
+            "trigger": {
+              "event": "application_submission"
+            },
+            "amount": {
+              "method": "fixed",
+              "value_usd": 500.0
+            },
+            "frequency": "per_application",
+            "payment_terms": "due upon submission"
+          },
+          "pred": {
+            "scope": "fee",
+            "name": "Processing Fee",
+            "trigger": {
+              "event": "application_submission"
+            },
+            "amount": {
+              "method": "fixed",
+              "value_usd": 500.0
+            }
+          }
+        },
+        {
+          "rule_id": "12.2.d",
+          "field": "body",
+          "gold": {
+            "scope": "fee",
+            "name": "Early Termination Fee",
+            "trigger": {
+              "event": "policy_cancellation",
+              "when": {
+                "op": "lte",
+                "attr": "policy.cancellation_within_months",
+                "value": 24,
+                "unmapped": false
+              }
+            },
+            "amount": {
+              "method": "derived",
+              "formula": {
+                "op": "multiply",
+                "args": [
+                  {
+                    "rule_ref": "12.2.b",
+                    "field": "monthly_amount"
+                  },
+                  {
+                    "value": 3.0
+                  }
+                ]
+              }
+            }
+          },
+          "pred": {
+            "scope": "fee",
+            "name": "Early Termination Fee",
+            "trigger": {
+              "event": "policy_cancellation",
+              "when": {
+                "op": "lte",
+                "attr": "policy.cancellation_within_months",
+                "value": 24,
+                "unmapped": false
+              }
+            },
+            "amount": {
+              "method": "derived",
+              "formula": {
+                "op": "multiply",
+                "args": [
+                  {
+                    "rule_ref": "3.1.b",
+                    "field": "annual_amount"
+                  },
+                  {
+                    "value": 3.0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
