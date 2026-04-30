@@ -4,6 +4,40 @@ A pipeline that turns natural-language policy text into **executable JSON rules*
 
 The deliverable is the JSON output, not just a parser. The schema, the controlled vocabulary, and the SQL compiler together prove that what we extract is actually executable.
 
+## Pipeline Flow
+
+```text
+Raw policy text
+  samples/*.txt
+        |
+        v
+Preprocess
+  preprocess.py
+  - find section headers
+  - split into subsection-level RuleChunk objects
+        |
+        v
+LLM extraction
+  extract.py + llm.py + prompts.py
+  - send one subsection at a time
+  - constrain output with schema.py and vocabulary.yaml
+        |
+        v
+Executable rule JSON
+  output/*.json
+  - validated Document / Rule objects
+  - predicate trees, scopes, source text, confidence
+        |
+        +------------------------+
+        |                        |
+        v                        v
+SQL compilation             Evaluation
+  compile_to_sql.py          eval.py
+  output/compiled.sql        output/eval_report.json
+```
+
+At a system level, the LLM does the semantic extraction, while the surrounding code owns deterministic splitting, schema validation, vocabulary governance, SQL translation, and accuracy measurement.
+
 ## Setup & Run
 
 ```bash
