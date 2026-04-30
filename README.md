@@ -7,33 +7,59 @@ The deliverable is the JSON output, not just a parser. The schema, the controlle
 ## Pipeline Flow
 
 ```text
-Raw policy text
-  samples/*.txt
-        |
-        v
-Preprocess
-  preprocess.py
-  - find section headers
-  - split into subsection-level RuleChunk objects
-        |
-        v
-LLM extraction
-  extract.py + llm.py + prompts.py
-  - send one subsection at a time
-  - constrain output with schema.py and vocabulary.yaml
-        |
-        v
-Executable rule JSON
-  output/*.json
-  - validated Document / Rule objects
-  - predicate trees, scopes, source text, confidence
-        |
-        +------------------------+
-        |                        |
-        v                        v
-SQL compilation             Evaluation
-  compile_to_sql.py          eval.py
-  output/compiled.sql        output/eval_report.json
++-----------------------------+
+| 1. Raw Policy Text          |
+| samples/*.txt               |
+| natural-language clauses    |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| 2. Preprocess               |
+| preprocess.py               |
+| section + subsection chunks |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| 3. LLM Extraction           |
+| extract.py + llm.py         |
+| prompts.py                  |
+| one chunk -> JSON rules     |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| 4. Validation + Governance  |
+| schema.py                   |
+| vocabulary.yaml             |
+| executable, canonical attrs |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| 5. Executable Rule JSON     |
+| output/*.json               |
+| scopes + predicate trees    |
++--------------+--------------+
+               |
+               v
+       +-------+-------+
+       |               |
+       v               v
++-------------+  +----------------+
+| 6A. Compile |  | 6B. Evaluate    |
+| to SQL      |  | against truth   |
+|             |  |                 |
+| compile_    |  | eval.py         |
+| to_sql.py   |  |                 |
++------+------+  +--------+-------+
+       |                  |
+       v                  v
++-------------+  +----------------+
+| output/     |  | output/        |
+| compiled.sql|  | eval_report.json|
++-------------+  +----------------+
 ```
 
 At a system level, the LLM does the semantic extraction, while the surrounding code owns deterministic splitting, schema validation, vocabulary governance, SQL translation, and accuracy measurement.
