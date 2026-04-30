@@ -1,10 +1,11 @@
 """Provider-agnostic LLM client for structured rule extraction.
 
-Three backends:
+Four backends:
   - Anthropic Claude via tool-use (forced tool_choice on a single tool whose
     input_schema is the extraction payload schema).
   - OpenAI via Structured Outputs (response_format with a Pydantic model).
   - Google Gemini via structured JSON output.
+  - Ollama for local models via JSON-mode chat completion.
 
 All expose `extract(chunk, schema_dict)` returning a parsed dict.
 
@@ -17,6 +18,8 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -35,7 +38,7 @@ PLACEHOLDER_API_KEYS = {
 class LLMResponse:
     payload: dict       # parsed JSON the model returned (matches extraction_payload_schema)
     model: str          # model id used
-    provider: str       # "anthropic" | "openai" | "google"
+    provider: str       # "anthropic" | "openai" | "google" | "ollama"
 
 
 class LLMClient(Protocol):
@@ -195,6 +198,63 @@ def constrain_attrs(schema: dict, allowed_attrs: list[str]) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Ollama / local
+# ---------------------------------------------------------------------------
+
+
+class OllamaClient:
+    def __init__(
+        self,
+        model: str = "gemma3:4b",
+        max_tokens: int = 2048,
+        base_url: str | None = None,
+    ):
+        self.model = model
+        self.max_tokens = max_tokens
+        self.base_url = (base_url or os.environ.get("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/")
+
+    def extract(
+        self, chunk: dict, schema: dict, allowed_attrs: list[str] | None = None
+    ) -> LLMResponse:
+        system_prompt = render_system_prompt(allowed_attrs or [])
+        messages = (
+            [{"role": "system", "content": system_prompt}]
+            + render_few_shot_messages()
+            + [{"role": "user", "content": render_user_message(chunk)}]
+        )
+        body = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False,
+            "format": "json",
+            "options": {
+                "temperature": 0,
+                "num_predict": self.max_tokens,
+            },
+        }
+        req = urllib.request.Request(
+            f"{self.base_url}/api/chat",
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.URLError as e:
+            raise RuntimeError(
+                f"Could not reach Ollama at {self.base_url}. Start it with `ollama serve`."
+            ) from e
+
+        content = data.get("message", {}).get("content", "")
+        return LLMResponse(
+            payload=json.loads(content),
+            model=self.model,
+            provider="ollama",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Gemini / Google
 # ---------------------------------------------------------------------------
 
@@ -303,6 +363,8 @@ def get_client(provider: str | None = None, model: str | None = None) -> LLMClie
     if provider in {"google", "gemini"}:
         _require_api_key("GEMINI_API_KEY")
         return GeminiClient(model=model or "gemini-2.0-flash")
+    if provider in {"ollama", "local"}:
+        return OllamaClient(model=model or os.environ.get("OLLAMA_MODEL", "gemma3:4b"))
     raise ValueError(
-        f"Unknown provider: {provider!r}. Use 'anthropic', 'openai', or 'google'."
+        f"Unknown provider: {provider!r}. Use 'anthropic', 'openai', 'google', or 'ollama'."
     )

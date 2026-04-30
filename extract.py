@@ -178,7 +178,7 @@ def main():
     p.add_argument(
         "--provider",
         default=None,
-        help="LLM provider: 'anthropic' (default), 'openai', or 'google'.",
+        help="LLM provider: 'anthropic' (default), 'openai', 'google', or 'ollama'.",
     )
     p.add_argument("--model", default=None, help="Override model id.")
     args = p.parse_args()
